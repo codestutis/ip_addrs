@@ -21,11 +21,12 @@
 
 // define colors for printing
 
-#define IF_NAME_COLOR ""
-#define V4_ADDR_COLOR ""
-#define V6_ADDR_COLOR ""
+#define IF_NAME_COLOR "\x1B[1;36m"
+#define INET_ADDR_COLOR "\x1B[1;35m"
+#define INET6_ADDR_COLOR "\x1B[1;34m"
 #define IF_UP_COLOR ""
 #define IF_DOWN_COLOR ""
+#define RESET_COLOR "\x1b[0m"
 
 typedef struct inet_addr {
     char *addr;
@@ -169,19 +170,19 @@ int main(int argc, char *argv[]) {
     Interface *tmp;
     int num = 1;
     for (tmp = if_list; tmp != NULL; tmp = tmp->next) {
-        printf("%d: %s\n", num, tmp->if_name);
+        printf(IF_NAME_COLOR "%d: %s\n" RESET_COLOR, num, tmp->if_name);
         printf("    inet: \n");
         inet_addr *inet_addrs;
         for (inet_addrs = tmp->inet; inet_addrs != NULL;
              inet_addrs = inet_addrs->next) {
-            printf("\t%s\n", inet_addrs->addr);
+            printf(INET_ADDR_COLOR "\t%s\n" RESET_COLOR, inet_addrs->addr);
         }
 
         printf("    inet6: \n");
         inet6_addr *inet6_addrs;
         for (inet6_addrs = tmp->inet6; inet6_addrs != NULL;
              inet6_addrs = inet6_addrs->next) {
-            printf("\t%s\n", inet6_addrs->addr);
+            printf(INET6_ADDR_COLOR "\t%s\n" RESET_COLOR, inet6_addrs->addr);
         }
         num++;
     }
