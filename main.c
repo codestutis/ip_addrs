@@ -1,11 +1,11 @@
 #include <ifaddrs.h>
-#include <linux/if_link.h>
 #include <netdb.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <sys/socket.h>
 #include <unistd.h>
+
 // == command options ==:
 //
 //  ip_addrs <interface>
@@ -20,7 +20,6 @@
 //      only show brief info about interfaces
 
 // define colors for printing
-
 #define IF_NAME_COLOR "\x1B[1;36m"
 #define INET_ADDR_COLOR "\x1B[1;35m"
 #define INET6_ADDR_COLOR "\x1B[1;34m"
@@ -159,10 +158,10 @@ void get_addrs() {
 }
 
 int main(int argc, char *argv[]) {
-    // hi
     get_addrs();
-    if (if_list == NULL)
+    if (if_list == NULL) {
         fprintf(stderr, "[error]: no interfaces found\n");
+    }
     // max bytes that the address char array will take up
 
     // print out each interface and its addresses
@@ -171,19 +170,23 @@ int main(int argc, char *argv[]) {
     int num = 1;
     for (tmp = if_list; tmp != NULL; tmp = tmp->next) {
         printf(IF_NAME_COLOR "%d: %s\n" RESET_COLOR, num, tmp->if_name);
-        printf("    inet: \n");
-        inet_addr *inet_addrs;
-        for (inet_addrs = tmp->inet; inet_addrs != NULL;
-             inet_addrs = inet_addrs->next) {
-            printf(INET_ADDR_COLOR "\t%s\n" RESET_COLOR, inet_addrs->addr);
+
+        if (tmp->inet != NULL) {
+            printf("    inet: \n");
+            inet_addr *inet_addrs;
+            for (inet_addrs = tmp->inet; inet_addrs != NULL; inet_addrs = inet_addrs->next) {
+                printf(INET_ADDR_COLOR "\t%s\n" RESET_COLOR, inet_addrs->addr);
+            }
         }
 
-        printf("    inet6: \n");
-        inet6_addr *inet6_addrs;
-        for (inet6_addrs = tmp->inet6; inet6_addrs != NULL;
-             inet6_addrs = inet6_addrs->next) {
-            printf(INET6_ADDR_COLOR "\t%s\n" RESET_COLOR, inet6_addrs->addr);
+        if (tmp->inet6 != NULL) {
+            printf("    inet6: \n");
+            inet6_addr *inet6_addrs;
+            for (inet6_addrs = tmp->inet6; inet6_addrs != NULL; inet6_addrs = inet6_addrs->next) {
+                printf(INET6_ADDR_COLOR "\t%s\n" RESET_COLOR, inet6_addrs->addr);
+            }
         }
+
         num++;
     }
 
