@@ -157,6 +157,35 @@ void get_addrs() {
     return;
 }
 
+void free_if_list(Interface *head) {
+    Interface *tmp = head;
+
+    while (head != NULL) {
+        tmp = head;
+        head = head->next;
+        free(tmp->ether);
+        free(tmp->family);
+        free(tmp->if_name);
+
+        inet_addr *i = tmp->inet;
+        while (tmp->inet != NULL) {
+            i = tmp->inet;
+            tmp->inet = tmp->inet->next;
+            free(i->addr);
+            free(i);
+        }
+
+        inet6_addr *i6 = tmp->inet6;
+        while (tmp->inet6 != NULL) {
+            i6 = tmp->inet6;
+            tmp->inet6 = tmp->inet6->next;
+            free(i6->addr);
+            free(i6);
+        }
+        free(tmp);
+    }
+}
+
 int main(int argc, char *argv[]) {
     get_addrs();
     if (if_list == NULL) {
@@ -174,7 +203,8 @@ int main(int argc, char *argv[]) {
         if (tmp->inet != NULL) {
             printf("    inet: \n");
             inet_addr *inet_addrs;
-            for (inet_addrs = tmp->inet; inet_addrs != NULL; inet_addrs = inet_addrs->next) {
+            for (inet_addrs = tmp->inet; inet_addrs != NULL;
+                 inet_addrs = inet_addrs->next) {
                 printf(INET_ADDR_COLOR "\t%s\n" RESET_COLOR, inet_addrs->addr);
             }
         }
@@ -182,13 +212,17 @@ int main(int argc, char *argv[]) {
         if (tmp->inet6 != NULL) {
             printf("    inet6: \n");
             inet6_addr *inet6_addrs;
-            for (inet6_addrs = tmp->inet6; inet6_addrs != NULL; inet6_addrs = inet6_addrs->next) {
-                printf(INET6_ADDR_COLOR "\t%s\n" RESET_COLOR, inet6_addrs->addr);
+            for (inet6_addrs = tmp->inet6; inet6_addrs != NULL;
+                 inet6_addrs = inet6_addrs->next) {
+                printf(INET6_ADDR_COLOR "\t%s\n" RESET_COLOR,
+                       inet6_addrs->addr);
             }
         }
 
         num++;
     }
+
+    free_if_list(if_list);
 
     return EXIT_SUCCESS;
 }
